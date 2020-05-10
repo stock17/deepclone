@@ -27,20 +27,13 @@ public class CopyUtils {
             }
 
             // Handle Arrays
-            if (object.getClass().isArray()) {
-                return copyArray(object);
-            }
+            if (object.getClass().isArray())    { return copyArray(object); }
 
             //Handle collections and maps
-            if (object instanceof List) {
-                return copyList(object);
-            }
-            if (object instanceof Set) {
-                return copySet(object);
-            }
-            if (object instanceof Map) {
-                return copyMap(object);
-            }
+            if (object instanceof List)         { return copyList(object);  }
+            if (object instanceof Queue)        { return copyQueue(object); }
+            if (object instanceof Set)          { return copySet(object);   }
+            if (object instanceof Map)          { return copyMap(object);   }
 
             // Handle objects
             T copy = createNewInstance(object);
@@ -55,7 +48,18 @@ public class CopyUtils {
         return null;
     }
 
-    private static <T> T copyMap(T object) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    private static <T> T copyQueue(T object) throws NoSuchMethodException, IllegalAccessException,
+            InvocationTargetException, InstantiationException {
+        Queue orig = (Queue) object;
+        Queue result = (Queue) object.getClass().getDeclaredConstructor().newInstance();
+        for (Object o : orig) {
+            result.add(CopyUtils.copyObject(o));
+        }
+        return (T) result;
+    }
+
+    private static <T> T copyMap(T object) throws NoSuchMethodException, IllegalAccessException,
+            InvocationTargetException, InstantiationException {
         Map orig = (Map) object;
         Map result = (Map) object.getClass().getDeclaredConstructor().newInstance();
         for (Object key : orig.keySet()) {
@@ -65,7 +69,8 @@ public class CopyUtils {
         return (T) result;
     }
 
-    private static <T> T copySet(T object) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    private static <T> T copySet(T object) throws NoSuchMethodException, IllegalAccessException,
+            InvocationTargetException, InstantiationException {
         Set orig = (Set) object;
         Set result = (Set) object.getClass().getDeclaredConstructor().newInstance();
         for (Object o : orig) {
@@ -74,7 +79,8 @@ public class CopyUtils {
         return (T) result;
     }
 
-    private static <T> T copyList(Object object) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    private static <T> T copyList(Object object) throws NoSuchMethodException, IllegalAccessException,
+            InvocationTargetException, InstantiationException {
         List orig = (List) object;
         List result = null;
         // special case for non-modified ArrayList

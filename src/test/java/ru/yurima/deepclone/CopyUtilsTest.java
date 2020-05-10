@@ -124,9 +124,18 @@ public class CopyUtilsTest {
 
     @Test
     public void testMapCopy(){
-        Map<Integer, String> map = new HashMap<>(); map.put(1, "one");
-        Map<Integer, String> copy = CopyUtils.deepCopy(map);
+        Map<Integer, Man> map = new HashMap<>(); map.put(1, new Man("K", 1, Arrays.asList("1")));
+        Map<Integer, Man> copy = CopyUtils.deepCopy(map);
         assert(map != copy);
-        assert (map.equals(copy));
+        assert (map.get(1)!= copy.get(1));
+        assert (map.get(1).getName().equals(copy.get(1).getName()));
+    }
+
+    @Test
+    public void testQueueCopy(){
+        Queue<String> queue = new PriorityQueue<>(); queue.add("one"); queue.add("two");
+        Queue<String> copy = CopyUtils.deepCopy(queue);
+        assert(queue != copy);
+        assert (queue.poll().equals(copy.poll()));
     }
 }
