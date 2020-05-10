@@ -3,20 +3,41 @@ package ru.yurima.deepclone;
 import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class CopyUtils {
     public static <T> T deepCopy(final T object) {
-        if (object.getClass().isPrimitive() || object.getClass() == String.class) {
-            return object;
-        }
-        if (object.getClass().isArray()) {
-            return (T) copyArray(object);
-        }
-
         try {
+            if (object.getClass().isPrimitive() || object.getClass() == String.class) {
+                return object;
+            }
+
             if (object instanceof Number)
                 return (T) object.getClass().getDeclaredConstructor(String.class).newInstance(object.toString());
+
+            if (object.getClass().isArray()) {
+                return (T) copyArray(object);
+            }
+
+            if (object instanceof List) {
+                List orig = (List) object;
+                List result = null;
+                // special case for non-modified ArrayList
+                if (object.getClass().getName().equals("java.util.Arrays$ArrayList")) {
+                    return (T) Arrays.asList(orig.toArray());
+                }
+
+                result = (List) object.getClass().getDeclaredConstructor().newInstance();
+
+                for (Object o : orig) {
+                    result.add(CopyUtils.deepCopy(o));
+                }
+                return (T) result;
+            }
+
+
+
 
             T copy = createNewInstance(object);
             copyFields(object, copy);
@@ -54,14 +75,7 @@ public class CopyUtils {
         Field[] fields = orig.getClass().getDeclaredFields();
         for (Field f : fields) {
             f.setAccessible(true);
-            if (f.getType().isPrimitive() || f.getType() == String.class) {
-                Object value = f.get(orig);
-                f.set(copy, value);
-            } else {
-                //TODO for objects
-                Object value = f.get(orig);
-                f.set(copy, value);
-            }
+            f.set(copy, CopyUtils.deepCopy(f.get(orig)));
         }
     }
 

@@ -1,11 +1,9 @@
 package ru.yurima.deepclone;
 
 import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 public class CopyUtilsTest {
 
@@ -19,10 +17,23 @@ public class CopyUtilsTest {
                 copy.getFavoriteBooks()!= null ? copy.getFavoriteBooks().toString() : "none");
         assert(man != copy);
 
+        assert(man.getName().equals(copy.getName()));
+        copy.setName("Nikas");
+        assert(!man.getName().equals(copy.getName()));
+
+        assert(man.getAge() == copy.getAge());
+        copy.setAge(30);
+        assert(man.getAge() != copy.getAge());
+
+        assert(man.getFavoriteBooks() != copy.getFavoriteBooks());
+        assert(man.getFavoriteBooks().get(0).equals(copy.getFavoriteBooks().get(0)));
+        copy.getFavoriteBooks().set(0, "Terra Nova");
+        assert(!man.getFavoriteBooks().get(0).equals(copy.getFavoriteBooks().get(0)));
+
     }
 
     @Test
-    public void PromitiveCopy(){
+    public void PrimitiveCopy(){
         int a = 65535;
         int b = CopyUtils.deepCopy(a);
         assert (a == b);
@@ -72,10 +83,19 @@ public class CopyUtilsTest {
     public void testListCopy(){
         List<Integer> ints = new ArrayList<>(); ints.add(65535);
         List<Integer> copy = CopyUtils.deepCopy(ints);
-
         assert(ints != copy);
         assert (ints.get(0) != copy.get(0));
         assert(ints.get(0).equals(copy.get(0)));
+
+        List<String> strings = new ArrayList<>( Arrays.asList("Foo"));
+        List<String> copy1 = CopyUtils.deepCopy(strings);
+        assert(strings != copy1);
+        assert(strings.get(0).equals(copy1.get(0)));
+
+        List<String> strings2 =  Arrays.asList("Bar");
+        List<String> copy2 = CopyUtils.deepCopy(strings2);
+        assert(strings2 != copy2);
+        assert(strings2.get(0).equals(copy2.get(0)));
 
     }
 }
