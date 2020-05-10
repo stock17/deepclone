@@ -5,7 +5,7 @@ import java.util.*;
 
 public class CopyUtils {
 
-    private static Set<Object> alreadyCopiedObjects = new HashSet<>();
+    private static final Set<Object> alreadyCopiedObjects = new HashSet<>();
 
     public static <T> T deepCopy(final T object){
         alreadyCopiedObjects.clear();

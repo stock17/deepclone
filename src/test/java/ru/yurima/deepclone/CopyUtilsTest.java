@@ -11,8 +11,8 @@ public class CopyUtilsTest {
 
     @Before
     public void init(){
-        man = new Man("John", 20, Arrays.asList("Martian"));
-        man.addFriend(new Man("Bill", 30, Arrays.asList("Stranger in a Strange Land")));
+        man = new Man("John", 20, Arrays.asList("Martian", "Back to Future"));
+        man.addFriend(new Man("Bill", 30, Arrays.asList("Stranger in a Strange Land", "Invisible Man")));
         // I'm a friend of mine (add recursive reference)
         man.addFriend(man);
     }
@@ -62,8 +62,6 @@ public class CopyUtilsTest {
         Integer a = 65535;
         Integer b = CopyUtils.deepCopy(a);
         assert (a.equals(b));
-        b = 65536;
-        assert (!a.equals(b));
     }
 
     @Test
@@ -103,12 +101,12 @@ public class CopyUtilsTest {
         copy.set(0, 65536);
         assert(!ints.get(0).equals(copy.get(0)));
 
-        List<String> strings = new ArrayList<>( Arrays.asList("Foo"));
+        List<String> strings = new ArrayList<>( Arrays.asList("Foo", "Bar"));
         List<String> copy1 = CopyUtils.deepCopy(strings);
         assert(strings != copy1);
         assert(strings.get(0).equals(copy1.get(0)));
 
-        List<String> strings2 =  Arrays.asList("Bar");
+        List<String> strings2 =  Arrays.asList("Foo", "Bar");
         List<String> copy2 = CopyUtils.deepCopy(strings2);
         assert(strings2 != copy2);
         assert(strings2.get(0).equals(copy2.get(0)));
@@ -120,11 +118,16 @@ public class CopyUtilsTest {
         Set<Integer> copy = CopyUtils.deepCopy(set);
         assert(set != copy);
         assert (set.equals(copy));
+
+        Set<Man> set1 = new HashSet<>(); set1.add(man);
+        Set<Man> copy1 = CopyUtils.deepCopy(set1);
+        assert(set1.contains(man));
+        assert(!copy1.contains(man));
     }
 
     @Test
     public void testMapCopy(){
-        Map<Integer, Man> map = new HashMap<>(); map.put(1, new Man("K", 1, Arrays.asList("1")));
+        Map<Integer, Man> map = new HashMap<>(); map.put(1, man);
         Map<Integer, Man> copy = CopyUtils.deepCopy(map);
         assert(map != copy);
         assert (map.get(1)!= copy.get(1));
@@ -136,6 +139,6 @@ public class CopyUtilsTest {
         Queue<String> queue = new PriorityQueue<>(); queue.add("one"); queue.add("two");
         Queue<String> copy = CopyUtils.deepCopy(queue);
         assert(queue != copy);
-        assert (queue.poll().equals(copy.poll()));
+        assert (Objects.equals(queue.peek(), copy.peek()));
     }
 }
