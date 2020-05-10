@@ -8,6 +8,8 @@ import java.util.List;
 
 public class CopyUtils {
     public static <T> T deepCopy(final T object) {
+        if (object.getClass().isPrimitive() || object.getClass() == String.class)
+            return object;
 
         try {
             T copy = createNewInstance(object);
