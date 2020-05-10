@@ -1,9 +1,8 @@
 package ru.yurima.deepclone;
 
 import org.junit.Test;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+
+import java.util.*;
 
 public class CopyUtilsTest {
 
@@ -96,6 +95,13 @@ public class CopyUtilsTest {
         List<String> copy2 = CopyUtils.deepCopy(strings2);
         assert(strings2 != copy2);
         assert(strings2.get(0).equals(copy2.get(0)));
+    }
 
+    @Test
+    public void testSetCopy(){
+        Set<Integer> set = new HashSet<>(); set.add(65535);
+        Set<Integer> copy = CopyUtils.deepCopy(set);
+        assert(set != copy);
+        assert (set.equals(copy));
     }
 }

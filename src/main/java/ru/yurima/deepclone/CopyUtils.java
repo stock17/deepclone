@@ -1,10 +1,7 @@
 package ru.yurima.deepclone;
 
 import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class CopyUtils {
     public static <T> T deepCopy(final T object) {
@@ -30,6 +27,15 @@ public class CopyUtils {
 
                 result = (List) object.getClass().getDeclaredConstructor().newInstance();
 
+                for (Object o : orig) {
+                    result.add(CopyUtils.deepCopy(o));
+                }
+                return (T) result;
+            }
+
+            if (object instanceof Set) {
+                Set orig = (Set) object;
+                Set result = (Set) object.getClass().getDeclaredConstructor().newInstance();
                 for (Object o : orig) {
                     result.add(CopyUtils.deepCopy(o));
                 }
