@@ -15,6 +15,9 @@ public class CopyUtils {
         }
 
         try {
+            if (object instanceof Number)
+                return (T) object.getClass().getDeclaredConstructor(String.class).newInstance(object.toString());
+
             T copy = createNewInstance(object);
             copyFields(object, copy);
             return copy;
@@ -25,6 +28,8 @@ public class CopyUtils {
             instantiationException.printStackTrace();
         } catch (InvocationTargetException invocationTargetException) {
             invocationTargetException.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
         }
 
         return null;
