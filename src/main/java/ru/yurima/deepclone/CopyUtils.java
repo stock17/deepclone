@@ -4,30 +4,45 @@ import java.lang.reflect.*;
 import java.util.*;
 
 public class CopyUtils {
-    public static <T> T deepCopy(final T object) {
+
+    private static Set<Object> alreadyCopiedObjects = new HashSet<>();
+
+    public static <T> T deepCopy(final T object){
+        alreadyCopiedObjects.clear();
+        return copyObject(object);
+    }
+
+    private static <T> T copyObject(final T object) {
         try {
             //Return primitive and immutable types
             if (object.getClass().isPrimitive() || object.getClass() == String.class || object instanceof Number) {
                 return object;
             }
 
+            // Check if the object is already copied
+            if (alreadyCopiedObjects.contains(object)) {
+                return object;
+            } else {
+                alreadyCopiedObjects.add(object);
+            }
+
+            // Handle Arrays
             if (object.getClass().isArray()) {
                 return copyArray(object);
             }
 
+            //Handle collections and maps
             if (object instanceof List) {
                 return copyList(object);
             }
-
             if (object instanceof Set) {
                 return copySet(object);
             }
-
             if (object instanceof Map) {
                 return copyMap(object);
             }
 
-            // Default
+            // Handle objects
             T copy = createNewInstance(object);
             copyFields(object, copy);
             return copy;
@@ -45,7 +60,7 @@ public class CopyUtils {
         Map result = (Map) object.getClass().getDeclaredConstructor().newInstance();
         for (Object key : orig.keySet()) {
             Object value = orig.get(key);
-            result.put(CopyUtils.deepCopy(key), CopyUtils.deepCopy(value));
+            result.put(CopyUtils.copyObject(key), CopyUtils.copyObject(value));
         }
         return (T) result;
     }
@@ -54,7 +69,7 @@ public class CopyUtils {
         Set orig = (Set) object;
         Set result = (Set) object.getClass().getDeclaredConstructor().newInstance();
         for (Object o : orig) {
-            result.add(CopyUtils.deepCopy(o));
+            result.add(CopyUtils.copyObject(o));
         }
         return (T) result;
     }
@@ -69,7 +84,7 @@ public class CopyUtils {
 
         result = (List) object.getClass().getDeclaredConstructor().newInstance();
         for (Object o : orig) {
-            result.add(CopyUtils.deepCopy(o));
+            result.add(CopyUtils.copyObject(o));
         }
         return (T) result;
     }
@@ -82,7 +97,7 @@ public class CopyUtils {
             System.arraycopy(object, 0, result, 0, length);
         } else {
             for (int i = 0; i < length; i++) {
-                    Array.set(result, i, CopyUtils.deepCopy(Array.get(object, i)));
+                    Array.set(result, i, CopyUtils.copyObject(Array.get(object, i)));
             }
         }
         return (T) result;
@@ -92,7 +107,7 @@ public class CopyUtils {
         Field[] fields = orig.getClass().getDeclaredFields();
         for (Field f : fields) {
             f.setAccessible(true);
-            f.set(copy, CopyUtils.deepCopy(f.get(orig)));
+            f.set(copy, CopyUtils.copyObject(f.get(orig)));
         }
     }
 

@@ -1,14 +1,25 @@
 package ru.yurima.deepclone;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.*;
 
 public class CopyUtilsTest {
 
+    private Man man;
+
+    @Before
+    public void init(){
+        man = new Man("John", 20, Arrays.asList("Martian"));
+        man.addFriend(new Man("Bill", 30, Arrays.asList("Stranger in a Strange Land")));
+        // I'm a friend of mine (add recursive reference)
+        man.addFriend(man);
+    }
+
     @Test
     public void deepCopy() {
-        Man man = new Man("John", 20, Arrays.asList("Martian"));
+
         Man copy = CopyUtils.deepCopy(man);
         System.out.printf("Original Name = %s, age = %d, books = %s\n", man.getName(), man.getAge(),
                 man.getFavoriteBooks().toString());
@@ -28,6 +39,10 @@ public class CopyUtilsTest {
         assert(man.getFavoriteBooks().get(0).equals(copy.getFavoriteBooks().get(0)));
         copy.getFavoriteBooks().set(0, "Terra Nova");
         assert(!man.getFavoriteBooks().get(0).equals(copy.getFavoriteBooks().get(0)));
+
+        assert(man == man.getFriends().get(1));
+        man.setName("Jack");
+        assert(man.getName().equals(man.getFriends().get(1).getName()));
 
     }
 
