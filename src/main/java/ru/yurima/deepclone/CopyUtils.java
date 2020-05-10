@@ -14,65 +14,69 @@ public class CopyUtils {
                 return (T) object.getClass().getDeclaredConstructor(String.class).newInstance(object.toString());
 
             if (object.getClass().isArray()) {
-                return (T) copyArray(object);
+                return copyArray(object);
             }
 
             if (object instanceof List) {
-                List orig = (List) object;
-                List result = null;
-                // special case for non-modified ArrayList
-                if (object.getClass().getName().equals("java.util.Arrays$ArrayList")) {
-                    return (T) Arrays.asList(orig.toArray());
-                }
-
-                result = (List) object.getClass().getDeclaredConstructor().newInstance();
-
-                for (Object o : orig) {
-                    result.add(CopyUtils.deepCopy(o));
-                }
-                return (T) result;
+                return copyList(object);
             }
 
             if (object instanceof Set) {
-                Set orig = (Set) object;
-                Set result = (Set) object.getClass().getDeclaredConstructor().newInstance();
-                for (Object o : orig) {
-                    result.add(CopyUtils.deepCopy(o));
-                }
-                return (T) result;
+                return copySet(object);
             }
 
             if (object instanceof Map) {
-                Map orig = (Map) object;
-                Map result = (Map) object.getClass().getDeclaredConstructor().newInstance();
-                for (Object key : orig.keySet()) {
-                    Object value = orig.get(key);
-                    result.put(CopyUtils.deepCopy(key), CopyUtils.deepCopy(value));
-                }
-                return (T) result;
+                return copyMap(object);
             }
 
-
-
-
+            // Default
             T copy = createNewInstance(object);
             copyFields(object, copy);
             return copy;
 
-        } catch (IllegalAccessException illegalAccessException) {
+        } catch (IllegalAccessException | InstantiationException | InvocationTargetException |
+                NoSuchMethodException illegalAccessException) {
             illegalAccessException.printStackTrace();
-        } catch (InstantiationException instantiationException) {
-            instantiationException.printStackTrace();
-        } catch (InvocationTargetException invocationTargetException) {
-            invocationTargetException.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
         }
 
         return null;
     }
 
-    private static Object copyArray(Object object) {
+    private static <T> T copyMap(T object) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        Map orig = (Map) object;
+        Map result = (Map) object.getClass().getDeclaredConstructor().newInstance();
+        for (Object key : orig.keySet()) {
+            Object value = orig.get(key);
+            result.put(CopyUtils.deepCopy(key), CopyUtils.deepCopy(value));
+        }
+        return (T) result;
+    }
+
+    private static <T> T copySet(T object) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        Set orig = (Set) object;
+        Set result = (Set) object.getClass().getDeclaredConstructor().newInstance();
+        for (Object o : orig) {
+            result.add(CopyUtils.deepCopy(o));
+        }
+        return (T) result;
+    }
+
+    private static <T> T copyList(Object object) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        List orig = (List) object;
+        List result = null;
+        // special case for non-modified ArrayList
+        if (object.getClass().getName().equals("java.util.Arrays$ArrayList")) {
+            return (T) Arrays.asList(orig.toArray());
+        }
+
+        result = (List) object.getClass().getDeclaredConstructor().newInstance();
+        for (Object o : orig) {
+            result.add(CopyUtils.deepCopy(o));
+        }
+        return (T) result;
+    }
+
+    private static <T> T copyArray(Object object) {
         Class type = object.getClass().getComponentType();
         Object result = Array.newInstance(type, Array.getLength(object));
         int length = Array.getLength(object);
@@ -83,8 +87,7 @@ public class CopyUtils {
                     Array.set(result, i, CopyUtils.deepCopy(Array.get(object, i)));
             }
         }
-
-        return result;
+        return (T) result;
     }
 
     private static <T> void copyFields(final T  orig, T copy) throws IllegalAccessException {
