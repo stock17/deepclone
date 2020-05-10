@@ -117,12 +117,18 @@ public class CopyUtils {
         }
     }
 
-    private static <T> T createNewInstance(T object) throws IllegalAccessException,
-            InvocationTargetException, InstantiationException {
-        Constructor<T> constructor = (Constructor<T>)
-                 object.getClass().getDeclaredConstructors()[0];
-        List<Object> params = getParamsList(constructor);
-        T instance = constructor.newInstance(params.toArray());
+    private static <T> T createNewInstance(T object)  {
+        Constructor<T>[] constructors = (Constructor<T>[]) object.getClass().getDeclaredConstructors();
+        T instance = null;
+        for (int i = 0; i < constructors.length && instance == null; i++) {
+            Constructor<T> constructor = constructors[i];
+            List<Object> params = getParamsList(constructor);
+            try {
+                instance = constructor.newInstance(params.toArray());
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
         return instance;
     }
 
