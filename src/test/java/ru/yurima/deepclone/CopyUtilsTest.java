@@ -47,7 +47,8 @@ public class CopyUtilsTest {
         Integer a = 65535;
         Integer b = CopyUtils.deepCopy(a);
         assert (a.equals(b));
-        assert (a != b);
+        b = 65536;
+        assert (!a.equals(b));
     }
 
     @Test
@@ -83,8 +84,9 @@ public class CopyUtilsTest {
         List<Integer> ints = new ArrayList<>(); ints.add(65535);
         List<Integer> copy = CopyUtils.deepCopy(ints);
         assert(ints != copy);
-        assert (ints.get(0) != copy.get(0));
-        assert(ints.get(0).equals(copy.get(0)));
+        assert(ints.equals(copy));
+        copy.set(0, 65536);
+        assert(!ints.get(0).equals(copy.get(0)));
 
         List<String> strings = new ArrayList<>( Arrays.asList("Foo"));
         List<String> copy1 = CopyUtils.deepCopy(strings);

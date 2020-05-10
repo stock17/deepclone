@@ -6,12 +6,10 @@ import java.util.*;
 public class CopyUtils {
     public static <T> T deepCopy(final T object) {
         try {
-            if (object.getClass().isPrimitive() || object.getClass() == String.class) {
+            //Return primitive and immutable types
+            if (object.getClass().isPrimitive() || object.getClass() == String.class || object instanceof Number) {
                 return object;
             }
-
-            if (object instanceof Number)
-                return (T) object.getClass().getDeclaredConstructor(String.class).newInstance(object.toString());
 
             if (object.getClass().isArray()) {
                 return copyArray(object);
