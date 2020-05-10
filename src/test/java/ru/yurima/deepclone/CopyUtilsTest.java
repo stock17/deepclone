@@ -17,4 +17,24 @@ public class CopyUtilsTest {
         assert(man != copy);
 
     }
+
+    @Test
+    public void testPrimitiveCopyArray(){
+        int[] arr = new int[]{1,2,3,4,5};
+        int[] copy =  CopyUtils.deepCopy(arr);
+        Arrays.stream(arr).forEach(System.out::print);
+        Arrays.stream(copy).forEach(System.out::print);
+        assert (Arrays.equals(arr,copy));
+        assert (arr != copy);
+    }
+
+    @Test
+    public void testObjectCopyArray(){
+        String[] arr = new String[]{"1","2","3","4","5"};
+        String[] copy =  CopyUtils.deepCopy(arr);
+        Arrays.stream(arr).forEach(System.out::print);
+        Arrays.stream(copy).forEach(System.out::print);
+        assert (Arrays.equals(arr,copy));
+        assert (arr != copy);
+    }
 }

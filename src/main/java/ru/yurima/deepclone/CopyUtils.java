@@ -1,15 +1,18 @@
 package ru.yurima.deepclone;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CopyUtils {
     public static <T> T deepCopy(final T object) {
-        if (object.getClass().isPrimitive() || object.getClass() == String.class)
+        if (object.getClass().isPrimitive() || object.getClass() == String.class) {
             return object;
+        }
+        if (object.getClass().isArray()) {
+            return (T) copyArray(object);
+        }
 
         try {
             T copy = createNewInstance(object);
@@ -25,6 +28,21 @@ public class CopyUtils {
         }
 
         return null;
+    }
+
+    private static Object copyArray(Object object) {
+        Class type = object.getClass().getComponentType();
+        Object result = Array.newInstance(type, Array.getLength(object));
+        int length = Array.getLength(object);
+        if (type.isPrimitive()) {
+            System.arraycopy(object, 0, result, 0, length);
+        } else {
+            for (int i = 0; i < length; i++) {
+                    Array.set(result, i, CopyUtils.deepCopy(Array.get(object, i)));
+            }
+        }
+
+        return result;
     }
 
     private static <T> void copyFields(final T  orig, T copy) throws IllegalAccessException {
