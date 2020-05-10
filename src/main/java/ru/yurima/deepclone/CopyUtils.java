@@ -42,6 +42,16 @@ public class CopyUtils {
                 return (T) result;
             }
 
+            if (object instanceof Map) {
+                Map orig = (Map) object;
+                Map result = (Map) object.getClass().getDeclaredConstructor().newInstance();
+                for (Object key : orig.keySet()) {
+                    Object value = orig.get(key);
+                    result.put(CopyUtils.deepCopy(key), CopyUtils.deepCopy(value));
+                }
+                return (T) result;
+            }
+
 
 
 

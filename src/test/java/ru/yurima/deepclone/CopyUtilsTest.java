@@ -104,4 +104,12 @@ public class CopyUtilsTest {
         assert(set != copy);
         assert (set.equals(copy));
     }
+
+    @Test
+    public void testMapCopy(){
+        Map<Integer, String> map = new HashMap<>(); map.put(1, "one");
+        Map<Integer, String> copy = CopyUtils.deepCopy(map);
+        assert(map != copy);
+        assert (map.equals(copy));
+    }
 }
