@@ -40,9 +40,10 @@ public class CopyUtilsTest {
         copy.getFavoriteBooks().set(0, "Terra Nova");
         assert(!man.getFavoriteBooks().get(0).equals(copy.getFavoriteBooks().get(0)));
 
-        assert(man == man.getFriends().get(1));
+        Man himself = man.getFriends().get(1);
+        assert(man == himself);
         man.setName("Jack");
-        assert(man.getName().equals(man.getFriends().get(1).getName()));
+        assert(man.getName().equals(himself.getName()));
 
     }
 
