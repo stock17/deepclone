@@ -5,7 +5,7 @@ import java.util.*;
 
 public class CopyUtils {
 
-    private static final Set<Object> alreadyCopiedObjects = new HashSet<>();
+    private static final Map<Object, Object> alreadyCopiedObjects = new HashMap<>();
 
     public static <T> T deepCopy(final T object){
         alreadyCopiedObjects.clear();
@@ -14,16 +14,15 @@ public class CopyUtils {
 
     private static <T> T copyObject(final T object) {
         try {
+
+            // Check if the object is already copied
+            if (alreadyCopiedObjects.keySet().contains(object)) {
+                return (T) alreadyCopiedObjects.get(object);
+            }
+
             //Return primitive and immutable types
             if (object.getClass().isPrimitive() || object.getClass() == String.class || object instanceof Number) {
                 return object;
-            }
-
-            // Check if the object is already copied
-            if (alreadyCopiedObjects.contains(object)) {
-                return object;
-            } else {
-                alreadyCopiedObjects.add(object);
             }
 
             // Handle Arrays
@@ -52,6 +51,7 @@ public class CopyUtils {
             InvocationTargetException, InstantiationException {
         Queue orig = (Queue) object;
         Queue result = (Queue) object.getClass().getDeclaredConstructor().newInstance();
+        alreadyCopiedObjects.put(object, result);
         for (Object o : orig) {
             result.add(CopyUtils.copyObject(o));
         }
@@ -62,6 +62,7 @@ public class CopyUtils {
             InvocationTargetException, InstantiationException {
         Map orig = (Map) object;
         Map result = (Map) object.getClass().getDeclaredConstructor().newInstance();
+        alreadyCopiedObjects.put(object, result);
         for (Object key : orig.keySet()) {
             Object value = orig.get(key);
             result.put(CopyUtils.copyObject(key), CopyUtils.copyObject(value));
@@ -73,6 +74,7 @@ public class CopyUtils {
             InvocationTargetException, InstantiationException {
         Set orig = (Set) object;
         Set result = (Set) object.getClass().getDeclaredConstructor().newInstance();
+        alreadyCopiedObjects.put(object, result);
         for (Object o : orig) {
             result.add(CopyUtils.copyObject(o));
         }
@@ -85,10 +87,13 @@ public class CopyUtils {
         List result = null;
         // special case for non-modified ArrayList
         if (object.getClass().getName().equals("java.util.Arrays$ArrayList")) {
-            return (T) Arrays.asList(orig.toArray());
+            result = (List) Arrays.asList(orig.toArray());
+            alreadyCopiedObjects.put(object, result);
+            return (T) result;
         }
 
         result = (List) object.getClass().getDeclaredConstructor().newInstance();
+        alreadyCopiedObjects.put(object, result);
         for (Object o : orig) {
             result.add(CopyUtils.copyObject(o));
         }
@@ -98,12 +103,13 @@ public class CopyUtils {
     private static <T> T copyArray(Object object) {
         Class type = object.getClass().getComponentType();
         Object result = Array.newInstance(type, Array.getLength(object));
+        alreadyCopiedObjects.put(object, result);
         int length = Array.getLength(object);
         if (type.isPrimitive()) {
             System.arraycopy(object, 0, result, 0, length);
         } else {
             for (int i = 0; i < length; i++) {
-                    Array.set(result, i, CopyUtils.copyObject(Array.get(object, i)));
+                Array.set(result, i, CopyUtils.copyObject(Array.get(object, i)));
             }
         }
         return (T) result;
@@ -129,6 +135,7 @@ public class CopyUtils {
                 e.printStackTrace();
             }
         }
+        alreadyCopiedObjects.put(object, instance);
         return instance;
     }
 
