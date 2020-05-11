@@ -89,6 +89,9 @@ public class CopyUtils {
         if (object.getClass().getName().equals("java.util.Arrays$ArrayList")) {
             result = (List) Arrays.asList(orig.toArray());
             alreadyCopiedObjects.put(object, result);
+            for (int i = 0; i < orig.size(); i++) {
+                result.set(i, CopyUtils.copyObject(orig.get(i)));
+            }
             return (T) result;
         }
 
