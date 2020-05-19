@@ -14,6 +14,8 @@ public class CopyUtils {
 
     private static <T> T copyObject(final T object) {
         try {
+            // Check on null
+            if (object == null) return null;
 
             // Check if the object is already copied
             if (alreadyCopiedObjects.keySet().contains(object)) {
